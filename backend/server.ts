@@ -8,9 +8,17 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
+const mongoURI = process.env.MONGO_URI;
+
+if (!mongoURI) {
+  console.error(
+    "MongoDB URI is not defined. Please check your environment variables."
+  );
+  process.exit(1); // 結束程序，因為沒有連接資料庫的 URI
+}
 
 mongoose
-  .connect(process.env.MONGO_URI!)
+  .connect(mongoURI)
   .then(() => {
     console.log("MongoDB connected successfully");
   })
