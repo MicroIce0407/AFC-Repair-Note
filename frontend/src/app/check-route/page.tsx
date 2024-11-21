@@ -26,6 +26,7 @@ interface QueryDate {
 }
 
 export default function Page(): JSX.Element {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const [routes, setRoutes] = useState<Route[]>([]);
   const now = new Date();
   const taiwanTime = toZonedTime(now, "Asia/Taipei");
@@ -43,7 +44,7 @@ export default function Page(): JSX.Element {
           !queryData.date && !queryData.station && !queryData.apparatus
             ? { ...queryData, date: today }
             : { ...queryData };
-        const response = await axios.get("http://localhost:5000/api/routes", {
+        const response = await axios.get(`${backendUrl}/api/routes`, {
           params: data,
         });
         const sortedRoutes = response.data.sort(
@@ -56,7 +57,7 @@ export default function Page(): JSX.Element {
       }
     };
     fetchRoutes();
-  }, [queryData, today]);
+  }, [queryData, today, backendUrl]);
 
   const changeHandle = (
     e: React.ChangeEvent<

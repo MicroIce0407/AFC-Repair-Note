@@ -17,19 +17,19 @@ interface Route {
 }
 
 export default function RouteDetail(): JSX.Element {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const router = useRouter();
   const params = useParams();
   const id = params?.id;
   const [route, setRoute] = useState<Route | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   useEffect(() => {
     if (id) {
       const fetchRoute = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:5000/api/routes/${id}`
-          );
+          const response = await axios.get(`${backendUrl}/api/routes/${id}`);
           setRoute(response.data);
         } catch (error) {
           console.error("Error fetching route detail:", error);
@@ -39,7 +39,7 @@ export default function RouteDetail(): JSX.Element {
       };
       fetchRoute();
     }
-  }, [id]);
+  }, [id, backendUrl]);
 
   if (isLoading) {
     return (
@@ -60,13 +60,16 @@ export default function RouteDetail(): JSX.Element {
   const deleteHandle = async () => {
     const confirmed = confirm("您確定要刪除此行程嗎？此操作無法撤銷！");
     if (confirmed) {
+      setIsDeleting(true);
       try {
-        await axios.delete(`http://localhost:5000/api/routes/${id}`);
+        await axios.delete(`${backendUrl}/api/routes/${id}`);
         alert("行程刪除成功！");
         router.back();
       } catch (error) {
         console.error("Error deleting route:", error);
         alert("刪除行程時發生錯誤，請稍後再試。");
+      } finally {
+        setIsDeleting(false);
       }
     }
   };
@@ -130,9 +133,12 @@ export default function RouteDetail(): JSX.Element {
         <button
           type="button"
           onClick={deleteHandle}
-          className="flex-1 flex justify-center p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:outline-none font-semibold"
+          disabled={isDeleting}
+          className={`flex-1 flex justify-center p-3 ${
+            isDeleting ? "bg-red-300" : "bg-red-600 hover:bg-red-700"
+          }  text-white rounded-lg  focus:ring-2 focus:ring-red-500 focus:outline-none font-semibold`}
         >
-          刪除
+          {isDeleting ? "刪除中..." : "刪除"}
         </button>
       </div>
     </div>

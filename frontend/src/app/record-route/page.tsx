@@ -16,7 +16,9 @@ interface FormData {
 }
 
 const Page: React.FC = () => {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const router = useRouter();
+  const [isAdding, setIsAdding] = useState<boolean>(false);
 
   const [formData, setFormData] = useState<FormData>({
     station: "",
@@ -39,13 +41,14 @@ const Page: React.FC = () => {
   };
 
   const submitHandle = async () => {
+    setIsAdding(true);
     try {
       const newFormData = {
         ...formData,
         module: formData.module === "" ? "N/A" : formData.module,
       };
       const response = await axios.post(
-        "http://localhost:5000/api/routes",
+        `${backendUrl}/api/routes`,
         newFormData
       );
       console.log("Response:", response.data);
@@ -56,6 +59,8 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error while adding route:", error);
       alert("An error occurred while adding the route.");
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -113,10 +118,13 @@ const Page: React.FC = () => {
         />
         <button
           type="button"
-          className="w-full mt-4 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
           onClick={submitHandle}
+          disabled={isAdding}
+          className={`w-full mt-4 p-3 ${
+            isAdding ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+          }  text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold`}
         >
-          提交
+          {isAdding ? "新建中..." : "提交"}
         </button>
       </form>
     </div>

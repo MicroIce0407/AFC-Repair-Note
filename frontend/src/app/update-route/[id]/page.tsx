@@ -19,11 +19,14 @@ interface Route {
 }
 
 export default function RouteDetail(): JSX.Element {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const router = useRouter();
   const params = useParams();
   const id = params?.id;
   const [route, setRoute] = useState<Route | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+
   const [formData, setFormData] = useState<Route>({
     _id: "",
     date: "",
@@ -34,15 +37,12 @@ export default function RouteDetail(): JSX.Element {
     module: "",
     description: "",
   });
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   useEffect(() => {
     if (id) {
       const fetchRoute = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:5000/api/routes/${id}`
-          );
+          const response = await axios.get(`${backendUrl}/api/routes/${id}`);
           setRoute(response.data);
         } catch (error) {
           console.error("Error fetching route detail:", error);
@@ -52,7 +52,7 @@ export default function RouteDetail(): JSX.Element {
       };
       fetchRoute();
     }
-  }, [id]);
+  }, [id, backendUrl]);
 
   useEffect(() => {
     if (route) {
@@ -92,7 +92,7 @@ export default function RouteDetail(): JSX.Element {
     setIsUpdating(true);
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/routes/${formData._id}`,
+        `${backendUrl}/api/routes/${formData._id}`,
         formData
       );
       console.log("Response:", response.data);

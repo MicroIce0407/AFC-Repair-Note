@@ -32,5 +32,5 @@ app.use(express.json());
 app.use("/api/routes", routeRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server running on ${process.env.BACKEND_URL}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
